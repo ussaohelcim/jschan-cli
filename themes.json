@@ -1,0 +1,15 @@
+{
+	"default":{
+		"name":"Green",
+		"selection":"DarkRed",
+		"separator":"Red",
+		"text":"White",
+		"backgroundText":"DarkGray",
+		"link":"DarkBlue",
+		"file":"DarkYellow",
+		"title":"Red",
+		"greenText":"DarkGreen",
+		"pinkText":"Magenta",
+		"quote":"DarkRed"
+	}
+}
