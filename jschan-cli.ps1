@@ -50,7 +50,7 @@ function Write-Overboard {
 		Write-Host "" $catalog[$i].board -NoNewline
 		Write-PostInfo -post $catalog[$i]
 		Write-PostMessage -post $catalog[$i]
-		Write-TerminalWide -char "-" Red
+		Write-TerminalWide -char "-" ($selectedStyle.separator)
 
 		$null = $threadsInverted.Add(
 			$catalog[$catalog.Count - $i - 1]
@@ -98,7 +98,7 @@ function Write-PostInfo{ param($post)
 function Write-PostMessage{ param($post)
 	$txt = $post.nomarkup ?? " "
 
-	$nl = [System.Environment]::NewLine # windows only?
+	$nl = [System.Environment]::NewLine
 	[string[]]$txt = $txt.Split($nl)
 
 	foreach($linha in $txt)
@@ -145,7 +145,7 @@ function Write-BoardCatalog { param ($board)
 		Write-PostInfo -post $catalog[$i]
 		Write-PostMessage -post $catalog[$i]
 		Write-Host "Replies:" $catalog[$i].replyposts -ForegroundColor ($selectedStyle.backgroundText)
-		Write-TerminalWide -char "-" Red
+		Write-TerminalWide -char "-" ($selectedStyle.separator)
 		$null = $threadsInverted.Add(
 			$catalog[$catalog.Count - $i - 1]
 		)
@@ -163,7 +163,7 @@ function Write-Thread { param($thread)
 	Write-PostMessage $thread
 	
 	foreach($reply in $thread.replies){
-		Write-TerminalWide -char "-" Red
+		Write-TerminalWide -char "-" ($selectedStyle.separator)
 		Write-PostInfo $reply
 		Write-PostMessage $reply
 	}
@@ -261,6 +261,7 @@ function New-Post{ param($thread)
 	$pwsrd = Read-Host "password ['$pass']"
 	$body.postpassword = $pwsrd -eq '' ? $pass : $pwsrd
 
+	Write-TerminalWide '-' ($selectedStyle.separator)
 	Write-PostInfo -post (@{
 		name = $body.name -eq '' ? "anon" : $body.name
 		files = @()
@@ -268,7 +269,11 @@ function New-Post{ param($thread)
 		postId = 0
 		date = "NOW"
 	})
-	
+	Write-PostMessage -post (@{
+		nomarkup = $body.message
+	})
+	Write-TerminalWide '-' ($selectedStyle.separator)
+
 	$choosed = $false
 	
 	while (!$choosed) {
@@ -312,7 +317,7 @@ function New-Instance{
 }
 
 function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
-	Write-TerminalWide -char "-" Red
+	Write-TerminalWide -char "-" ($selectedStyle.separator)
 
 	switch ($location) {
 		([JschanLocation]::Home) { 
@@ -347,7 +352,7 @@ function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
 			# $location = [JschanLocation]::ChooseBoard 
 			# $payload = (boardlist).boards http://fatchan.gitgud.site/jschan-docs/#board-list
 
-			Write-Host "Press enter go back to choose an instance..." -ForegroundColor DarkGray
+			Write-Host "Press enter go back to choose an instance..." -ForegroundColor ($selectedStyle.backgroundText)
 
 			Write-Host "Choose a " -NoNewline
 			Write-Host "[board]" -BackgroundColor ($selectedStyle.selection) -NoNewline
@@ -381,11 +386,11 @@ function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
 
 			if($null -eq $overboard)
 			{
-				Write-Host "'n' to create a new thread." -ForegroundColor DarkGray
+				Write-Host "'n' to create a new thread." -ForegroundColor ($selectedStyle.backgroundText)
 			}
 
-			Write-Host "'h' to go back to $root ." -ForegroundColor DarkGray
-			Write-Host "Press enter to refresh the catalog." -ForegroundColor DarkGray
+			Write-Host "'h' to go back to $root ." -ForegroundColor ($selectedStyle.backgroundText)
+			Write-Host "Press enter to refresh the catalog." -ForegroundColor ($selectedStyle.backgroundText)
 			Write-Host "Choose a " -NoNewline
 			Write-Host "[thread]" -BackgroundColor ($selectedStyle.selection) -NoNewline
 			$op = Read-Host " "
@@ -420,10 +425,10 @@ function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
 		([JschanLocation]::Thread) {
 			# $payload = thread http://fatchan.gitgud.site/jschan-docs/#thread
 			
-			Write-Host "'r' to reply this thread." -ForegroundColor DarkGray
-			Write-Host "'c' to go back to catalog." -ForegroundColor DarkGray
-			Write-Host "'h' to go back to instance selection." -ForegroundColor DarkGray
-			Write-Host "Press enter to refresh the thread." -ForegroundColor DarkGray
+			Write-Host "'r' to reply this thread." -ForegroundColor ($selectedStyle.backgroundText)
+			Write-Host "'c' to go back to catalog." -ForegroundColor ($selectedStyle.backgroundText)
+			Write-Host "'h' to go back to instance selection." -ForegroundColor ($selectedStyle.backgroundText)
+			Write-Host "Press enter to refresh the thread." -ForegroundColor ($selectedStyle.backgroundText)
 
 			$op = Read-Host "Choose an option"
 

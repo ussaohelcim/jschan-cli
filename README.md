@@ -16,3 +16,11 @@ Windows Powershell 5 (the default powershell, that comes installed on Windows) d
 ```
 powershell.exe -ExecutionPolicy Bypass -File ./ptchina.ps1
 ```
+
+# Custom themes
+
+To use your own theme just create on on `themes.json` and run:
+
+```
+jschan-cli.ps1 -style "name"
+```
