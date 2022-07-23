@@ -6,7 +6,7 @@ CLI client for jschan made with powershell.
 ## Powershell 7 (Windows / Linux / MacOS)
 
 ```
-pwsh ./jschan-cli
+pwsh ./jschan-cli.ps1
 ```
 
 ## Windows Powershell 5
@@ -14,7 +14,7 @@ pwsh ./jschan-cli
 Windows Powershell 5 (the default powershell, that comes installed on Windows) doesnt allow you to run scripts by default, you need to bypass the execution policy or change your execution policy.  
 
 ```
-powershell.exe -ExecutionPolicy Bypass -File ./jschan-cli
+powershell.exe -ExecutionPolicy Bypass -File ./jschan-cli.ps1
 ```
 
 # Custom themes
