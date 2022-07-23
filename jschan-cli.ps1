@@ -225,7 +225,6 @@ function New-Post{ param($thread)
 	$link_ToPost = "$root/forms/board/$board/post"
 	
 	$header =  @{
-		# Referer = ($null -eq $postId) ? "$root/$board/index.html" : "$root/$board/thread/$postId.html"
 		Referer = "$root/$board/index.html" 
 		origin = "$root"
 	}
@@ -296,9 +295,19 @@ function New-Post{ param($thread)
 
 }
 
-function New-Reply{}
 
-function New-Instance{ param($instance)
+function New-Instance{ 
+	$name = Read-Host "Instance name"
+	$link = Read-Host "Instance url (without the last '/')"
+
+	$instances = Get-InstancesJson
+
+	$instances += @{
+			name = $name
+			link = $link
+		}
+	
+	Set-Content instances.json ( $instances | ConvertTo-Json)
 
 }
 
@@ -318,14 +327,19 @@ function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
 
 			$script:root = $payload[$op].link
 
-			
-			Write-InstanceHome -url ($payload[$op].link) 
-			# try {
-			# }
-			# catch {
-			# 	Write-ErrorMessage "Wrong option..."
-			# 	Write-Home
-			# }
+			if($op -eq "new"){
+				New-Instance
+				Write-Home
+			}
+			else{
+				try {
+					Write-InstanceHome -url ($payload[$op].link) 
+				}
+				catch {
+					Write-ErrorMessage "Wrong option..."
+					Write-Home
+				}
+			}
 
 			break
 		}
@@ -378,10 +392,8 @@ function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
 
 			$board = $payload[$op].board
 			$postId = $payload[$op].postId
-			#Write-Host $payload
 		
 			if($null -eq $overboard -and 'n' -eq $op){
-				#Write-Host "creating thread "
 				New-Post (@{
 					board = $payload[0].board
 					postId = $null
@@ -433,11 +445,6 @@ function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
 			}
 			break
 		}
-		([JschanLocation]::NewThread) {
-			
-			break
-		}
-
 		Default {}
 	}
 

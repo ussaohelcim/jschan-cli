@@ -1,14 +1,14 @@
 [
-	{
-		"name":"ptchan",
-		"link":"https://ptchan.org"
-	},
-	{
-		"name":"fatchan",
-		"link":"https://fatchan.org"
-	},
-	{
-		"name":"zzzchan",
-		"link":"https://zzzchan.xyz"
-	}
+  {
+    "name": "ptchan",
+    "link": "https://ptchan.org"
+  },
+  {
+    "name": "fatchan",
+    "link": "https://fatchan.org"
+  },
+  {
+    "name": "zzzchan",
+    "link": "https://zzzchan.xyz"
+  }
 ]
