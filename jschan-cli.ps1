@@ -11,6 +11,24 @@ enum JschanLocation {
 	NewReply # location to reply a thread
 }
 
+function Join-PathUrl{
+	param(
+		[string]$root,
+		[string[]]$childrenPaths
+	)
+
+	$r = $root.TrimEnd('/')
+
+	for ($i = 0; $i -lt $childrenPaths.Count; $i++) {
+		$t = $childrenPaths[$i].TrimEnd("/")
+		$t = $t.TrimStart("/")
+
+		$r += "/$t"
+	}
+
+	return $r
+}
+
 function Get-JsonFromUrl { param ($urljson)
 	$ProgressPreference = 'SilentlyContinue'
 	$resp = Invoke-WebRequest -Uri $urljson
@@ -44,7 +62,7 @@ function Write-TerminalWide{ param($char,$color)
 function Write-Overboard {
 	Clear-Host
 	
-	$overboard = Get-JsonFromUrl -urljson "$root/catalog.json"
+	$overboard = Get-JsonFromUrl -urljson (Join-PathUrl $root "catalog.json") #"$root/catalog.json"
 	[System.Collections.ArrayList]$threadsInverted = @()
 	$catalog = $overboard.threads
 
@@ -91,7 +109,7 @@ function Write-PostInfo{ param($post)
 		foreach($file in $info.files){
 			$filename = $file.filename
 			$og = $file.originalFilename
-			$_link = "$root/file/$filename"
+			$_link = (Join-PathUrl $root ("file",$filename)) #"$root/file/$filename"
 			Write-Host $og ">" $_link -ForegroundColor ($selectedStyle.file)
 		}
 	}
@@ -137,7 +155,7 @@ function Write-BoardCatalog { param ($board)
 	Clear-Host
 		
 	$_boardTag = $board._id
-	$link = "$root/$_boardTag/catalog.json"
+	$link = (Join-PathUrl $root -childrenPaths ($_boardTag,"catalog.json")) #"$root/$_boardTag/catalog.json"
 	Write-Host $link
 	$catalog = Get-JsonFromUrl -urljson $link
 
@@ -211,7 +229,7 @@ function Write-Home {
 function Write-InstanceHome { param($url)
 	Clear-Host
 
-	$boardList = (Get-JsonFromUrl -urljson "$url/boards.json?local_first=true").boards
+	$boardList = (Get-JsonFromUrl -urljson (Join-PathUrl $url "boards.json?local_first=true")).boards #"$url/boards.json?local_first=true").boards
 
 	$opNum = 0
 
@@ -238,10 +256,10 @@ function New-Post{ param($thread)
 	$postId = $thread.postId
 	Write-Host $root $board $postId
 
-	$link_ToPost = "$root/forms/board/$board/post"
+	$link_ToPost = (Join-PathUrl $root ("forms","board",$board,"post")) #"$root/forms/board/$board/post"
 	
 	$header =  @{
-		Referer = "$root/$board/index.html" 
+		Referer = (Join-PathUrl $root ($board,"index.html")) #"$root/$board/index.html" 
 		origin = "$root"
 	}
 
@@ -307,11 +325,11 @@ function New-Post{ param($thread)
 			Start-Sleep -Seconds 3
 			Write-BoardCatalog -board (@{_id = $board})
 		}else{
-			Write-Thread -thread (Get-JsonFromUrl "$root/$board/thread/$postId.json")
+			Write-Thread -thread (Get-JsonFromUrl (Join-PathUrl $root ($board,"thread","$postId.json"))) #"$root/$board/thread/$postId.json")
 		}	
 	}
 	else{
-		Write-Thread -thread (Get-JsonFromUrl "$root/$board/thread/$postId.json")
+		Write-Thread -thread (Get-JsonFromUrl (Join-PathUrl $root ($board,"thread","$postId.json"))) #"$root/$board/thread/$postId.json")
 	}
 
 }
@@ -319,17 +337,24 @@ function New-Post{ param($thread)
 
 function New-Instance{ 
 	$name = Read-Host "Instance name"
-	$link = Read-Host "Instance url (without the last '/')"
+	$link = Read-Host "Instance url"
 
-	$instances = Get-InstancesJson
+	try {
+		$r = (Invoke-WebRequest $link)
+		$instances = Get-InstancesJson
 
-	$instances += @{
+		$instances += @{
 			name = $name
 			link = $link
 		}
-	
-	Set-Content instances.json ( $instances | ConvertTo-Json)
-
+		
+		Set-Content instances.json ( $instances | ConvertTo-Json)
+	}
+	catch {
+		Write-Host "Wrong link..."
+		New-Instance
+		
+	}
 }
 
 function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
@@ -428,7 +453,7 @@ function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
 			}
 			else{
 				try {
-					Write-Thread -thread (Get-JsonFromUrl "$root/$board/thread/$postId.json")
+					Write-Thread -thread (Get-JsonFromUrl (Join-PathUrl $root ($board,"thread","$postId.json"))) #"$root/$board/thread/$postId.json")
 				}
 				catch {
 					Write-Error "Wrong option..."
@@ -461,7 +486,8 @@ function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
 				Default {
 					$board = $payload.board
 					$postId = $payload.postId
-					Write-Thread -thread (Get-JsonFromUrl "$root/$board/thread/$postId.json")
+					
+					Write-Thread -thread (Get-JsonFromUrl (Join-PathUrl $root ($board,"thread","$postId.json"))) #"$root/$board/thread/$postId.json")
 				}
 			}
 			break
