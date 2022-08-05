@@ -1,4 +1,4 @@
-param($style )
+param($style,$chan)
 #region Utilities
 
 enum JschanLocation {
@@ -178,20 +178,33 @@ function Write-Home {
 	#script home
 	Clear-Host
 
-	$instancesJSON = Get-InstancesJson
+	if(!$chan){
+		$instancesJSON = Get-InstancesJson
 
-	Write-Host "Welcome to jschan-cli."
-
-	$num = 0
-	foreach($chan in $instancesJSON){
-		Write-Host "[$num]" -BackgroundColor ($selectedStyle.selection) -NoNewline
-		Write-Host "" $chan.name "`t" -NoNewline
-		Write-Host $chan.link 
-		$num++
+		Write-Host "Welcome to jschan-cli."
+	
+		$num = 0
+		foreach($chan in $instancesJSON){
+			Write-Host "[$num]" -BackgroundColor ($selectedStyle.selection) -NoNewline
+			Write-Host "" $chan.name "`t" -NoNewline
+			Write-Host $chan.link 
+			$num++
+		}
+		Write-Host "[new] = add new instance"
+	
+		Enter-Option -location ([JschanLocation]::Home) -payload $instancesJSON
 	}
-	Write-Host "[new] = add new instance"
-
-	Enter-Option -location ([JschanLocation]::Home) -payload $instancesJSON
+	else{
+		try {
+			Write-InstanceHome -url $chan
+		}
+		catch {
+			$chan = $null
+			Write-Home
+		}
+		
+	}
+	
 }
 
 
@@ -460,7 +473,7 @@ function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
 
 function Get-Style{ param($name)
 	$path = Join-Path -Path ($PSScriptRoot) -ChildPath "themes.json"
-	
+
 	$themes = Get-Content $path | ConvertFrom-Json
 	return $themes.$name ?? $themes.default
 }
