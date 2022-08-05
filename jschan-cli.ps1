@@ -214,6 +214,7 @@ function Write-Home {
 	}
 	else{
 		try {
+			$root = $chan
 			Write-InstanceHome -url $chan
 		}
 		catch {
