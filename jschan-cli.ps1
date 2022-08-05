@@ -21,7 +21,10 @@ function Get-WindowSize {
 	return (Get-Host).UI.RawUI.WindowSize.Width
 }
 function Get-InstancesJson{
-	return (Get-Content .\instances.json | ConvertFrom-Json)
+
+	$path = Join-Path -Path ($PSScriptRoot) -ChildPath "instances.json" 
+	#Write-Host $path
+	return (Get-Content $path | ConvertFrom-Json)
 }
 function Write-TerminalWide{ param($char,$color)
 	# TODO rename function
@@ -456,7 +459,9 @@ function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
 }
 
 function Get-Style{ param($name)
-	$themes = Get-Content .\themes.json | ConvertFrom-Json
+	$path = Join-Path -Path ($PSScriptRoot) -ChildPath "themes.json"
+	
+	$themes = Get-Content $path | ConvertFrom-Json
 	return $themes.$name ?? $themes.default
 }
 
