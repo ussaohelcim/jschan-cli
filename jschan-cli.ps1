@@ -92,8 +92,10 @@ function Write-PostInfo{ param($post)
 	}
 
 	$no = $info.postId
-	Write-Host "" $info.name "" -ForegroundColor ($selectedStyle.name) -NoNewline
-	Write-Host $info.date "no."$no -NoNewline
+	Write-Host "" $info.subject -ForegroundColor ($selectedStyle.subject)  -NoNewline
+	Write-Host "" $info.name -ForegroundColor ($selectedStyle.name) -NoNewline
+	Write-Host "" $post.capcode $post.tripcode -ForegroundColor ($selectedStyle.capcode) -NoNewline
+	Write-Host "" $info.date "no."$no -NoNewline
 
 	$quotes = " "
 

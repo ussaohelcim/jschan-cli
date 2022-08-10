@@ -10,6 +10,8 @@
 		"title":"Red",
 		"greenText":"DarkGreen",
 		"pinkText":"Magenta",
-		"quote":"DarkRed"
+		"quote":"DarkRed",
+		"subject":"DarkBlue",
+		"capcode":"DarkRed"
 	}
 }
