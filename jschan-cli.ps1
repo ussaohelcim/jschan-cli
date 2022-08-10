@@ -214,7 +214,7 @@ function Write-Home {
 	}
 	else{
 		try {
-			$root = $chan
+			$root = $chan.Contains('https://') ? $chan : "https://$chan"
 			Write-InstanceHome -url $chan
 		}
 		catch {
@@ -253,11 +253,12 @@ function Get-RandomString {
 }
 
 function New-Post{ param($thread)
-	$board = $thread.board
+	$board = $thread[0].board
 	$postId = $thread.postId
-	Write-Host $root $board $postId
+	Write-Host $root $board $postId 
 
 	$link_ToPost = (Join-PathUrl $root ("forms","board",$board,"post")) #"$root/forms/board/$board/post"
+	#Write-Host $link_ToPost
 	
 	$header =  @{
 		Referer = (Join-PathUrl $root ($board,"index.html")) #"$root/$board/index.html" 
@@ -310,8 +311,10 @@ function New-Post{ param($thread)
 	Write-TerminalWide '-' ($selectedStyle.separator)
 
 	$choosed = $false
-	
+	$op = ""
+
 	while (!$choosed) {
+		Write-Host $root $board $postId
 		$op = Read-Host "Send post to thread $postId ? [y,n]"
 		
 		$choosed = $op -eq "y" -or $op -eq "n"
@@ -372,7 +375,7 @@ function Enter-Option { param([JschanLocation]$location,$payload, $overboard)
 
 			$op = Read-Host " "
 
-			$script:root = $payload[$op].link
+			$root = $payload[$op].link
 
 			if($op -eq "new"){
 				New-Instance
